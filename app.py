@@ -36,8 +36,8 @@ def study_section(section_text):
     summary = generate_study_summary(chunks)
     return summary
 
-def test_section(section_text):
-    questions = generate_test_questions(section_text)
+def test_section(section_text, difficulty):
+    questions = generate_test_questions(section_text, difficulty)
     return questions
 
 def search_similar_chunks(query: str, collection="my_collection"):
@@ -105,53 +105,45 @@ with gr.Blocks() as demo:
     status_output = gr.Textbox(label="Status", interactive=False)
     outline_output = gr.Textbox(label="Generated Outline", interactive=False, lines=10)
 
-    # # We also have a chunk viewer
-    # chunk_viewer = gr.Textbox(label="Chunk Viewer", interactive=False, lines=10)
-
-    # # We'll store the chunk list and current index in gr.State, so we can navigate
+    # We can still keep chunk_list_state and chunk_index_state if needed.
     chunk_list_state = gr.State([])
     chunk_index_state = gr.State(0)
 
-    # prev_btn = gr.Button("Previous Chunk")
-    # next_btn = gr.Button("Next Chunk")
-
-    # Additional text boxes for study/test
+    # Textbox for user to paste a section
     section_input = gr.Textbox(label="Paste a section from the outline here to study/test")
+
+    # Dropdown for question difficulty
+    difficulty_dropdown = gr.Dropdown(
+        choices=["Easy", "Intermediate", "Hard"], 
+        label="Question Difficulty",
+        value="Intermediate"  # default selection
+    )
+
     study_btn = gr.Button("Study")
     test_btn = gr.Button("Test")
+
     study_output = gr.Textbox(label="Study Summary", interactive=False, lines=6)
     test_output = gr.Textbox(label="Test Questions", interactive=False, lines=6)
 
-    # ------- WIRING -------
-
-    # 1) Upload -> parse PDF -> store in Qdrant -> retrieve chunks
-    # The function returns:
-    #  (status, outline_text, chunk_list, first_chunk)
+    # Wiring upload_document to handle PDF ingestion
     upload_btn.click(
         fn=upload_document,
         inputs=[pdf_input],
-        # outputs=[status_output, outline_output, chunk_list_state, chunk_viewer]
         outputs=[status_output, outline_output, chunk_list_state]
     )
 
-    # 2) Study / Test
-    study_btn.click(study_section, inputs=[section_input], outputs=[study_output])
-    test_btn.click(test_section, inputs=[section_input], outputs=[test_output])
+    # Study
+    study_btn.click(
+        fn=study_section, 
+        inputs=[section_input], 
+        outputs=[study_output]
+    )
 
-    # 3) Navigation Buttons for chunk_viewer
-    #    We'll pass chunk_list_state & chunk_index_state as inputs,
-    #    and we'll return new (chunk_index_state, chunk_viewer) as outputs.
-
-    # prev_btn.click(
-    #     fn=show_prev_chunk,
-    #     inputs=[chunk_list_state, chunk_index_state],
-    #     outputs=[chunk_index_state, chunk_viewer]
-    # )
-
-    # next_btn.click(
-    #     fn=show_next_chunk,
-    #     inputs=[chunk_list_state, chunk_index_state],
-    #     outputs=[chunk_index_state, chunk_viewer]
-    # )
+    # Test (now takes 2 inputs: the section text + difficulty)
+    test_btn.click(
+        fn=test_section, 
+        inputs=[section_input, difficulty_dropdown], 
+        outputs=[test_output]
+    )
 
 demo.launch(server_name="0.0.0.0", server_port=7860, inbrowser=True)

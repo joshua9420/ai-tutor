@@ -5,7 +5,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from qdrant_client import QdrantClient
 from qdrant_client.models import PointStruct, VectorParams, Distance
 
-def chunk_text(document_text: str, chunk_size=1000, chunk_overlap=200):
+def chunk_text(document_text: str, chunk_size=2000, chunk_overlap=400):
     """
     Splits text into chunks for embedding.
     """

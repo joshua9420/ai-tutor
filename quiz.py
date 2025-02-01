@@ -22,7 +22,7 @@ def generate_study_summary(chunk_text: list, model_name="llama3.2") -> str:
     return "\n\n".join(output_chunks)
 
 
-def generate_test_questions(chunk_text: str, model_name="deepseek-r1:8b") -> str:
+def generate_test_questions(chunk_text: str, difficulty: str, model_name="deepseek-r1:8b") -> str:
     """
     Generate 3 multiple-choice questions (each with 4 options and 1 correct answer)
     from the given text, using Ollama.
@@ -35,7 +35,7 @@ def generate_test_questions(chunk_text: str, model_name="deepseek-r1:8b") -> str
         model=model_name,
         messages=[
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": f"""Generate 3 multiple-choice questions from the text. text: {chunk_text}"""}
+            {"role": "user", "content": f"""Generate 3 {difficulty}-level multiple-choice questions from the text. text: {chunk_text}"""}
         ]
     )
 
