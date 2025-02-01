@@ -105,15 +105,15 @@ with gr.Blocks() as demo:
     status_output = gr.Textbox(label="Status", interactive=False)
     outline_output = gr.Textbox(label="Generated Outline", interactive=False, lines=10)
 
-    # We also have a chunk viewer
-    chunk_viewer = gr.Textbox(label="Chunk Viewer", interactive=False, lines=10)
+    # # We also have a chunk viewer
+    # chunk_viewer = gr.Textbox(label="Chunk Viewer", interactive=False, lines=10)
 
-    # We'll store the chunk list and current index in gr.State, so we can navigate
+    # # We'll store the chunk list and current index in gr.State, so we can navigate
     chunk_list_state = gr.State([])
     chunk_index_state = gr.State(0)
 
-    prev_btn = gr.Button("Previous Chunk")
-    next_btn = gr.Button("Next Chunk")
+    # prev_btn = gr.Button("Previous Chunk")
+    # next_btn = gr.Button("Next Chunk")
 
     # Additional text boxes for study/test
     section_input = gr.Textbox(label="Paste a section from the outline here to study/test")
@@ -130,7 +130,8 @@ with gr.Blocks() as demo:
     upload_btn.click(
         fn=upload_document,
         inputs=[pdf_input],
-        outputs=[status_output, outline_output, chunk_list_state, chunk_viewer]
+        # outputs=[status_output, outline_output, chunk_list_state, chunk_viewer]
+        outputs=[status_output, outline_output, chunk_list_state]
     )
 
     # 2) Study / Test
@@ -141,16 +142,16 @@ with gr.Blocks() as demo:
     #    We'll pass chunk_list_state & chunk_index_state as inputs,
     #    and we'll return new (chunk_index_state, chunk_viewer) as outputs.
 
-    prev_btn.click(
-        fn=show_prev_chunk,
-        inputs=[chunk_list_state, chunk_index_state],
-        outputs=[chunk_index_state, chunk_viewer]
-    )
+    # prev_btn.click(
+    #     fn=show_prev_chunk,
+    #     inputs=[chunk_list_state, chunk_index_state],
+    #     outputs=[chunk_index_state, chunk_viewer]
+    # )
 
-    next_btn.click(
-        fn=show_next_chunk,
-        inputs=[chunk_list_state, chunk_index_state],
-        outputs=[chunk_index_state, chunk_viewer]
-    )
+    # next_btn.click(
+    #     fn=show_next_chunk,
+    #     inputs=[chunk_list_state, chunk_index_state],
+    #     outputs=[chunk_index_state, chunk_viewer]
+    # )
 
 demo.launch(server_name="0.0.0.0", server_port=7860, inbrowser=True)

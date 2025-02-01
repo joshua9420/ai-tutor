@@ -1,5 +1,4 @@
 # quiz.py (or study.py)
-from ollama import Client
 from ollama import ChatResponse, chat
 
 def generate_study_summary(chunk_text: list, model_name="llama3.2") -> str:
@@ -28,17 +27,16 @@ def generate_test_questions(chunk_text: str, model_name="deepseek-r1:8b") -> str
     Generate 3 multiple-choice questions (each with 4 options and 1 correct answer)
     from the given text, using Ollama.
     """
-    prompt = f"""You are a tutor. Given the text below, generate 3 multiple-choice questions.
-Each question should have 4 options (A, B, C, D), and exactly one correct answer.
+    system_prompt = f"""You are a tutor. Given the text below, generate 3 multiple-choice questions.
+    Each question should have 4 options (A, B, C, D), and exactly one correct answer. Make use of plausible distractors.
+    """
 
-Text: {chunk_text}
-Questions:
-"""
-
-    client = Client()
-    response_chunks = client.generate(
+    response_chunks: ChatResponse = chat(
         model=model_name,
-        prompt=prompt
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": f"""Generate 3 multiple-choice questions from the text. text: {chunk_text}"""}
+        ]
     )
 
     result = []
@@ -46,7 +44,10 @@ Questions:
     #     result.append(chunk["response"])
 
     # return "".join(result)
-    return response_chunks.message.content
+    results = response_chunks.message.content
+    results = results.split("</think>")[-1].strip()
+
+    return results
 
 
 def evaluate_answer(chunk_text: str, user_answer: str, model_name="llama3.2") -> str:
